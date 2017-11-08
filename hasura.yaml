@@ -1,4 +1,4 @@
-description: Blank template for a Hasura project
-keywords: base, getting-started
-name: base
+description: A basic hello world django application running on Hasura.
+keywords: django, python, hello
+name: hello-python-django
 platformVersion: v0.15.3
