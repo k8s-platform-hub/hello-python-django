@@ -1,4 +1,4 @@
-description: A basic hello world django application running on Hasura.
+description: A Hasura starter project with a ready to deploy Python hello-world web application with Django framework.
 keywords: getting-started, django, python, hello
 name: hello-python-django
 platformVersion: v0.15.3
