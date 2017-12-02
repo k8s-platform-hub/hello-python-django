@@ -16,7 +16,7 @@ RUN pip3 install -r /tmp/requirements.txt
 # Copy the Configuration and the Scripts
 COPY app/conf /conf
 COPY app/scripts /usr/src/scripts
-RUN chmod a+x /usr/src/scripts/migrate.sh
+RUN chmod a+x /usr/src/scripts/runserver.sh
 
 # Copy the source
 COPY app/src /usr/src/app
@@ -24,4 +24,4 @@ COPY app/src /usr/src/app
 WORKDIR /usr/src/app/helloworld
 
 # App port number is configured through the gunicorn config file
-ENTRYPOINT ["/usr/src/scripts/migrate.sh"]
+ENTRYPOINT ["/usr/src/scripts/runserver.sh"]

@@ -1,26 +1,26 @@
 # hello-python-django
 
-This project consists of a basic Hasura project with a simple Python-Django app running on it. Once this app is deployed on a Hasura cluster, you will have the app running at `https://api.<cluster-name>.hasura-app.io`
+This project consists of a basic hasura project with a simple Python-Django app running on it. Once this app is deployed on a Hasura cluster, you will have the app running at https://app.<cluster-name>.hasura-app.io`
 
-This is the right place to start if you are planning to build or want to learn to build a Python-Django app with Hasura.
+This is the right place to start if you are planning to build or want to learn to build an Python-Django  app with hasura.
 
 ## Sections
 
 * [Introduction](#introduction)
 * [Quickstart](#quickstart)
-* [Adding your own Python-Django code](#adding-your-existing-django-code)
+* [Local development](#local-development)
 * [Data API](#data-apis)
 * [Auth API](#auth-apis)
 * [Filestore API](#filestore-apis)
+* [Custom microservice](#custom-microservice)
+* [Migrate from an existing Python-Django app](#migrate-from-an-existing-project)
 * [Local development](#local-development)
 * [FAQ](#faq)
 
 ## Introduction
 
 This quickstart project comes with the following by default:
-
-1. A basic Hasura project
-
+1. A basic hasura project
 2. Two tables `article` and `author` with some dummy data
 
 ## Quickstart
@@ -36,12 +36,43 @@ $ cd hello-python-django
 
 The above command does the following:
 1. Creates a new folder in the current working directory called `hello-python-django`
-2. Creates a new free Hasura cluster for you and sets that cluster as the default cluster for this project
+2. Creates a new free hasura cluster for you and sets that cluster as the default cluster for this project
 3. Initializes `hello-python-django` as a git repository and adds the necessary git remotes.
 
-### Step 2: Deploying this project
+### Step 2: Getting cluster information
 
-To deploy the project:
+Every hasura project is run on a Hasura cluster. To get details about the cluster this project is running on:
+
+```sh
+$ hasura cluster status
+```
+
+This will give you your cluster status like so
+
+```sh
+INFO Status:
+Cluster Name:       h34-excise98-stg
+Cluster Alias:      hasura
+Kube Context:       h34-excise98-stg
+Platform Version:   v0.15.3
+Cluster State:      Synced
+```
+
+Keep a note of your cluster name. Alternatively, you can also go to your [hasura dashboard](https://dashboard.hasura.io) and see the clusters you have.
+
+### Api console
+
+Every hasura cluster comes with an api console that gives your a GUI to test out the baas features of hasura. To open the api console
+
+```sh
+$ hasura api-console
+```
+
+Please note that while using Django models, tables will not show up in Hasura API Console.
+
+### Step 3: Deploying on a hasura cluster
+
+To deploy your app:
 
 ```sh
 $ git add .
@@ -50,39 +81,44 @@ $ git push hasura master
 ```
 When you push for the first time, it might take sometime. Next time onwards, it is really fast.
 
-Once the above commands are executed successfully, head over to `https://api.<cluster-name>.hasura-app.io` (in this case `https://api.h34-excise98-stg.hasura-app.io`) to view your app.
+Once the above commands are executed successfully, head over to `https://app.<cluster-name>.hasura-app.io` (in this case `https://app.h34-excise98-stg.hasura-app.io`) to view your app.
 
-## Adding your existing Django code
-The Django microservice[1] sample code is inside the `microservices/api/app` directory. You can copy all your existing Django code directly inside this directory, and start deploying your own Django code to Hasura cluster.
+### Local development
 
-### Step 1: Add your Django code in the microservices directory
-Copy all your exising Django source code in `microservices/api/app` directory or replace the `microservices/api/app` directory with your app directory. Ensure that the structure of the directory is coherent with the current structure.
-
-### Step 2: Git add and commit
-```
-$ git add .
-$ git commit -m "Added my Django code"
-```
-
-### Step 3: Deploy
-```
-$ git push hasura master
-```
-Now your Django application should be running at: `https://api.<cluster-name>.hasura-app.io`
-
-[1] a microservice is a running application on the Hasura cluster. This could be an API, a web app, a Javascript app etc.
-
-## Hasura API console
-
-Every Hasura cluster comes with an api console that gives you a GUI to test out the BaaS features of Hasura. To open the api console
-
-```sh
-$ hasura api-console
-```
+- Setup port forwarding to connect to postgres on Hasura
+  ```bash
+  $ hasura microservice port-forward postgres -n hasura --local-port=6432
+  ```
+- Open another terminal
+- Install virtualenv for python from: https://virtualenv.pypa.io/en/stable/installation/
+- Create and activate virtual environment inside `microservices/app`:
+  ```bash
+  $ cd microservices/app
+  $ virtualenv venv -p python3
+  $ source venv/bin/activate
+  ```
+- Install dependencies
+  ```bash
+  $ pip install -r app/conf/requirements.txt
+  ```
+- Set environemnt variables
+  ```bash
+  $ export POSTGRES_USERNAME="admin"
+  $ export POSTGRES_PASSWORD="xxxxxxx" # get this password by executing `hasura secrets list` (it will be called `postgres.password`)
+  $ export POSTGRES_HOSTNAME="localhost"
+  $ export POSTGRES_PORT="6432"
+  ```
+- Start dev server
+  ```bash
+  $ cd app/src/helloworld
+  $ ./manage.py runserver
+  ```
+- Your app will be available at http://localhost:8000
+- Make changes to code and test it out
 
 ## Data APIs
 
-Hasura provides ready to use data apis to make powerful data queries on your tables. This means that you have ready-to-use JSON apis on any tables created. The url to be used to make these queries is always of the type: `https://data.cluster-name.hasura-app.io/v1/query` (in this case `https://data.h34-excise98-stg.hasura-app.io`)
+Hasura provides ready to use data apis to make powerful data queries on your tables. This means that you have ready-to-use JSON apis on any tables created. The url to be used to make these queries is always of the type: `https://data.<cluster-name>.hasura-app.io/v1/query` (in this case `https://data.h34-excise98-stg.hasura-app.io`)
 
 As mentioned earlier, this quickstart app comes with two pre-created tables `author` and `article`.
 
@@ -108,9 +144,9 @@ Alternatively, you can also view the schema for these tables on the api console 
 ![alt text][data1]
 ![alt text][data2]
 
-This means that you can now leverage the Hasura data queries to perform CRUD operations on these tables.
+This means that you can now leverage the hasura data queries to perform CRUD operations on these tables.
 
-For eg, to fetch a list of all articles from the article table, you have to send the following JSON request to the data api endpoint -> `https://data.cluster-name.hasura-app.io/v1/query` (replace `cluster-name` with your cluster name)
+For eg, to fetch a list of all articles from the article table, you have to send the following JSON request to the data api endpoint -> `https://data.<cluster-name>.hasura-app.io/v1/query` (replace `<cluster-name>` with your cluster name)
 
 ```json
 {
@@ -146,24 +182,21 @@ You can try out these in the `API EXPLORER` tab of the `api console`. To learn m
 
 There might be cases where you might want to perform some custom business logic on your apis. For example, sending an email/sms to a user on sign up or sending a push notification to the mobile device when some event happens. For this, you would want to create your own custom microservice which does these for you on the endpoints that you define.
 
-This quickstart comes with one such custom microservice written in Python using the Django framework. Check it out in action at `https://api.cluster-name.hasura-app.io` . Currently, it just returns a JSON response of "Hello World" at that endpoint.
+This quickstart comes with one such custom microservice written in Python using the Django framework. Check it out in action at `https://app.<cluster-name>.hasura-app.io` . Currently, it just returns a JSON response of "Hello World" at that endpoint.
 
 In case you want to use another language/framework for your custom microservice. Take a look at our docs to see how you can add a new custom microservice.
 
-## Local development
+## Migrate from an existing project
 
-Everytime you push, your code will get deployed on a public URL. However, for faster iteration you should locally test your changes.
+If you have an existing Python-Django app and would like to migrate it to Hasura:
 
-### Testing your app locally
+- Replace the `microservices/app/app` directory with your app directory.
+- Ensure that the structure of the directory is coherent with the current structure.
+- Make sure the database connection environment variables are set.
+- `git add . && git commit -m "Migration Commit"`
+- `git push hasura master`
 
-Follow these steps to test out your app locally
-
-```sh
-$ cd microservices/api/
-$ docker build -t python-django:<tag> .
-$ docker run -d -p 8080:8080 python-django:<tag>
-```
-Your app will be running on port 8080.
+Now your existing app should be running on `https://app.<cluster-name>.hasura-app.io`
 
 ## Files and Directories
 
@@ -191,7 +224,7 @@ The project (a.k.a. project directory) has a particular directory structure and 
 │   ├── 1504788327_create_table_user.up.yaml
 │   └── 1504788327_create_table_user.up.sql
 └── microservices
-    └── api
+    └── app
         ├── app/
         ├── k8s.yaml
         └── Dockerfile

@@ -77,10 +77,10 @@ DATABASES = {
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'NAME': 'hasuradb',
-         'USER': 'admin',
-         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-         'HOST': os.environ.get('POSTGRES_HOST'),
-         'PORT': '5432',
+         'USER': os.environ['POSTGRES_USERNAME'],
+         'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+         'HOST': os.environ['POSTGRES_HOSTNAME'],
+         'PORT': os.environ['POSTGRES_PORT'],
      }
  }
 
