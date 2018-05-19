@@ -101,7 +101,7 @@ Once the above commands are executed successfully, head over to `https://app.<cl
   ```bash
   $ pip install -r app/conf/requirements.txt
   ```
-- Set environemnt variables
+- Set environment variables
   ```bash
   $ export POSTGRES_USERNAME="admin"
   $ export POSTGRES_PASSWORD="xxxxxxx" # get this password by executing `hasura secrets list` (it will be called `postgres.password`)
